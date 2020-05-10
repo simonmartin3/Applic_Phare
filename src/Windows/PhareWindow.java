@@ -239,7 +239,7 @@ public class PhareWindow extends javax.swing.JFrame {
         else
         {
             String bateauAtt = vBateau.get(0);
-            InfoBateauWindow ibw = new InfoBateauWindow(this, true, bateauAtt);
+            InfoPhareWindow ibw = new InfoPhareWindow(this, true, bateauAtt);
             ibw.setVisible(true);
             Button_Suivant.setEnabled(false);
         }

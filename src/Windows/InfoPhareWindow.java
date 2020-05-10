@@ -17,16 +17,16 @@ import javax.swing.JOptionPane;
  *
  * @author Simon
  */
-public class InfoBateauWindow extends javax.swing.JDialog {
+public class InfoPhareWindow extends javax.swing.JDialog {
 
     /**
-     * Creates new form InfoBateauWindow
+     * Creates new form InfoPhareWindow
      */
     PhareWindow PW;
     ImageIcon img;
     int tmpIndex;
 
-    public InfoBateauWindow(java.awt.Frame parent, boolean modal, String tmp) {
+    public InfoPhareWindow(java.awt.Frame parent, boolean modal, String tmp) {
         
         // Initialisation variables --------------------------------------------
         PW = (PhareWindow) parent;
@@ -259,21 +259,23 @@ public class InfoBateauWindow extends javax.swing.JDialog {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(InfoBateauWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(InfoPhareWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(InfoBateauWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(InfoPhareWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(InfoBateauWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(InfoPhareWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(InfoBateauWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(InfoPhareWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                InfoBateauWindow dialog = new InfoBateauWindow(new javax.swing.JFrame(), true, null);
+                InfoPhareWindow dialog = new InfoPhareWindow(new javax.swing.JFrame(), true, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
