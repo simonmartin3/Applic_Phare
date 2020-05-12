@@ -5,7 +5,7 @@
  */
 package Windows;
 
-import Interfaces.UtilisateurNombre;
+import Beans.*;
 import java.awt.Color;
 import java.io.File;
 import java.util.*;
@@ -28,13 +28,28 @@ public class PhareWindow extends javax.swing.JFrame{
     private NetworkBasicClient nbc;
     private int PORT = 50000;
     
-    Stack <String> vBateau = new Stack<>();
+    public Stack <String> vBateau = new Stack<>();
+    ThreadRandomGenerator TRG;
+    KindOfBoatBean kobb;
     
     public PhareWindow(java.awt.Frame parent, Hashtable tmp) {
         initComponents();
         this.setLocation(0,0);
         this.setResizable(false);
         this.setTitle("Phare d'Inpres-Harbour");
+        
+        // Thread & Beans
+        kobb = new KindOfBoatBean();
+        BoatBean bb = new BoatBean();
+        NotifyBean nb = new NotifyBean();
+        nb.NotifyBean(this);
+        
+        TRG = new ThreadRandomGenerator(kobb, 5, 100, 1, 1);
+        kobb.KindOfBoatBean(TRG);
+        
+        kobb.addPropertyChangeListener(bb);
+        
+        bb.addBoatEventListenerList(nb);        
         
         // Création de bateau en attente
         
@@ -54,8 +69,7 @@ public class PhareWindow extends javax.swing.JFrame{
                 
         ImageIcon image1 = new ImageIcon(new ImageIcon(image).getImage().getScaledInstance(Label_Image.getWidth(), Label_Image.getHeight(), 20));
         Label_Image.setText(null);
-        Label_Image.setIcon(image1);
-        
+        Label_Image.setIcon(image1);        
     }
 
     /**
@@ -253,7 +267,17 @@ public class PhareWindow extends javax.swing.JFrame{
         }
         else
         {
-            Label_Attente.setText("Bateaux en attente");
+            Label_Attente.setText("Bateaux en attente (" + vBateau.size() + ")");
+            if(vBateau.size() >= 15)
+            {
+                TRG.setEnMarche(false);
+                System.err.println("Thread interrupt");
+            }
+            else if(TRG.getEnMarche() == false && vBateau.size() < 10)
+            {
+                TRG.setEnMarche(true);
+                System.err.println("Thread run");
+            }
         }
         
     }//GEN-LAST:event_List_AttentePropertyChange

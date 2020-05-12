@@ -12,17 +12,23 @@ import java.beans.*;
  *
  * @author Simon
  */
-public class KinfOfBoatBean implements UtilisateurNombre{
+public class KindOfBoatBean implements UtilisateurNombre{
     
     private ThreadRandomGenerator TRG;
-    private int nbreRandom;
-    private int oldNbreRandom;
+    private String oldType;
     private String typeBateau;
-    protected PropertyChangeSupport PCS = new PropertyChangeSupport(this);
+    protected PropertyChangeSupport PCS;
     
-    public void KinfOfBoatBean()
+    public void KindOfBoatBean()
     {
+
+    }
+    
+    public void KindOfBoatBean(ThreadRandomGenerator tmp)
+    {
+        TRG = tmp;
         TRG.start();
+        PCS = new PropertyChangeSupport(this);
     }
     
     public void addPropertyChangeListener(PropertyChangeListener pcl)
@@ -35,15 +41,12 @@ public class KinfOfBoatBean implements UtilisateurNombre{
         PCS.removePropertyChangeListener(pcl);
     }
     
-    public void setTypeBateau(String newType)
+    public void setTypeBateau(String type)
     {
-        String oldType;
-        if(oldNbreRandom != nbreRandom)
-        {
-            oldType = this.typeBateau;
-            this.typeBateau = newType;
-            PCS.firePropertyChange("typeBateau", oldType, this.typeBateau);
-        }
+        oldType = this.typeBateau;
+
+        this.typeBateau = type;
+        PCS.firePropertyChange("typeBateau", oldType, this.typeBateau);
     }
     
     public String getIdentifiant()
@@ -52,18 +55,16 @@ public class KinfOfBoatBean implements UtilisateurNombre{
     }
     
     public void traiteNombre(int n)
-    {
-        oldNbreRandom = this.nbreRandom;
-        nbreRandom = n;
-        
+    {        
         if((n % 7) == 0)
         {
             setTypeBateau("Plaisance");
+            typeBateau="none";
         }
         if((n % 17) == 0)
         {
             setTypeBateau("Peche");
+            typeBateau="none";
         }
-    }
-    
+    }    
 }

@@ -6,6 +6,8 @@
 package Beans;
 
 import Interfaces.UtilisateurNombre;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -16,6 +18,7 @@ public class ThreadRandomGenerator extends java.lang.Thread {
     private UtilisateurNombre utilisateurThread;
     private int borneInferieure, borneSuperieure, multipleDeclenchement, tempsPause;
     private int nombreProduit;
+    private boolean isEnMarche = true;
 
     public ThreadRandomGenerator(UtilisateurNombre un, int bi, int bs, int md, int tp)
     {
@@ -30,25 +33,47 @@ public class ThreadRandomGenerator extends java.lang.Thread {
     public void run()
     {
         Double dr;
-        while (true)
+        
+        try
         {
-            dr = new Double(borneInferieure + Math.random()*(borneSuperieure - borneInferieure));
-            nombreProduit = dr.intValue();
-            System.out.println(utilisateurThread.getIdentifiant() + "> nombreProduit = " + nombreProduit);
-
-            if (nombreProduit % multipleDeclenchement == 0)
+            Thread.sleep(5000);
+        
+            while(true)
             {
-                System.out.println(utilisateurThread.getIdentifiant() + "> -------------- !!!!!!! " + nombreProduit + "!!!!");
-                utilisateurThread.traiteNombre(nombreProduit);
-            }
+                synchronized(this)
+                {
+                    while(!isEnMarche)
+                    {
+                         wait();
+                    }
+                }
 
-            try
-            {
+                dr = new Double(borneInferieure + Math.random()*(borneSuperieure - borneInferieure));
+                nombreProduit = dr.intValue();
+                System.out.println(utilisateurThread.getIdentifiant() + "> nombreProduit = " + nombreProduit);
+
+                if (nombreProduit % multipleDeclenchement == 0)
+                {
+                    System.out.println(utilisateurThread.getIdentifiant() + "> -------------- !!!!!!! " + nombreProduit + "!!!!");
+                    utilisateurThread.traiteNombre(nombreProduit);
+                }
+
                 Thread.sleep(tempsPause*1000);
             }
-            catch (InterruptedException e) {
-                System.out.println("Erreur de thread interrompu : " + e.getMessage());
-            }
         }
+        catch (InterruptedException e) {
+            System.out.println("Erreur de thread interrompu : " + e.getMessage());
+        }
+    }
+    
+    public synchronized void setEnMarche(boolean em)
+    {
+        isEnMarche = em;
+        notify();
+    }
+    
+    public boolean getEnMarche()
+    {
+        return isEnMarche;
     }
 }

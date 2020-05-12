@@ -7,28 +7,36 @@ package Beans;
 
 import Interfaces.*;
 import Windows.*;
+import Windows.PhareWindow;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Simon
  */
-public class NotifyBean implements BoatEventListener {
+public class NotifyBean extends BoatBean implements BoatEventListener {
     
-    PhareWindow PW;
+    PhareWindow tmp;
     
     public void NotifyBean()
     {
         
     }
     
-    public void NotifyBean(PhareWindow window)
+    public void NotifyBean(PhareWindow pw)
     {
-        
+        tmp = pw;
     }
     
     public void boatEventDetected(BoatEvent e)
     {
+        String libelle = e.getTypeBateau() + " / " + e.getPavillon();
         
+        JOptionPane.showMessageDialog(new JFrame(), "Nouveau bateau", "Infos", JOptionPane.ERROR_MESSAGE);
+              
+        tmp.vBateau.push(libelle);
+        tmp.insertionBateau();
     }
     
 }

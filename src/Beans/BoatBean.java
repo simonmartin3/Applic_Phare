@@ -7,6 +7,9 @@ package Beans;
 
 import Interfaces.BoatEventListener;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
@@ -15,25 +18,26 @@ import java.util.Hashtable;
  *
  * @author Simon
  */
-public class BoatBean extends NotifyBean{
+public class BoatBean implements PropertyChangeListener{
     
     private String typeBateau;
     private String pavillon;
-    private Date dateArrivee;
+    private Date dateArrivee = new Date();;
     private ArrayList <BoatEventListener> BoatEventListenerList = new ArrayList<BoatEventListener>();    
     
     public void BoatBean()
     {
-        
+
     }
     
     public void propertyChange(PropertyChangeEvent e)
     {
-        randomPavillon();
+        pavillon = randomPavillon();
+        typeBateau = e.getNewValue().toString();
         notifyBoatEventDetected(typeBateau, pavillon, dateArrivee);
     }
     
-    public void randomPavillon()
+    public String randomPavillon()
     {
         Hashtable<Integer, String> pavillonHashtable = new Hashtable<Integer, String>(); 
         Double random;
@@ -42,10 +46,9 @@ public class BoatBean extends NotifyBean{
         pavillonHashtable.put(2, "UK"); 
         pavillonHashtable.put(3, "DE");
         
-        random = new Double(1 + Math.random()*(3 - 1));
+        random = new Double(1 + Math.random()*(4 - 1));
         
-        pavillon = pavillonHashtable.get(random.intValue());       
-        System.out.println("Le pavillon est : " + pavillon);
+        return pavillonHashtable.get(random.intValue());
     }
     
     public void addBoatEventListenerList(BoatEventListener bel)
