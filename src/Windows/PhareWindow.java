@@ -5,6 +5,7 @@
  */
 package Windows;
 
+import Interfaces.UtilisateurNombre;
 import java.awt.Color;
 import java.io.File;
 import java.util.*;
@@ -18,7 +19,7 @@ import network.*;
  *
  * @author Simon
  */
-public class PhareWindow extends javax.swing.JFrame {
+public class PhareWindow extends javax.swing.JFrame{
 
     /**
      * Creates new form PhareWindow
@@ -28,7 +29,6 @@ public class PhareWindow extends javax.swing.JFrame {
     private int PORT = 50000;
     
     Stack <String> vBateau = new Stack<>();
-    
     
     public PhareWindow(java.awt.Frame parent, Hashtable tmp) {
         initComponents();
@@ -315,6 +315,7 @@ public class PhareWindow extends javax.swing.JFrame {
         Label_Réponse.setText("/");
         Button_Suivant.setEnabled(true);
     }
+
     /**
      * @param args the command line arguments
      */
@@ -367,4 +368,5 @@ public class PhareWindow extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
+
 }
