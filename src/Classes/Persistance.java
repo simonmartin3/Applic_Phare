@@ -14,35 +14,19 @@ import java.util.*;
  */
 public class Persistance {
     
-    public static String getPathLogin()
+    public static String getPathConfig()
     {
-        String filePath = System.getProperty("user.dir") + System.getProperty("file.separator") + "src" + System.getProperty("file.separator") + "Config" + System.getProperty("file.separator") + "login.properties";
+        String filePath = System.getProperty("user.home") + System.getProperty("file.separator") + "Config" + System.getProperty("file.separator") + "config.properties";
         return filePath;
     }
     
-    public static String getPathBateau()
+    public static String getPath(String key) throws IOException
     {
-        String filePath = System.getProperty("user.dir") + System.getProperty("file.separator") + "src" + System.getProperty("file.separator") + "Config" + System.getProperty("file.separator") + "bateaux.dat";
+        Properties properties = Persistance.LoadProperties(getPathConfig());
+        String filePath = properties.getProperty(key);
         return filePath;
     }
     
-//    public static String getPathQuai()
-//    {
-//        String filePath = System.getProperty("user.dir") + System.getProperty("file.separator") + "src" + System.getProperty("file.separator") + "Config" + System.getProperty("file.separator") + "quai.dat";
-//        return filePath;
-//    }
-//    
-//    public static String getPathPonton()
-//    {
-//        String filePath = System.getProperty("user.dir") + System.getProperty("file.separator") + "src" + System.getProperty("file.separator") + "Config" + System.getProperty("file.separator") + "ponton.dat";
-//        return filePath;
-//    }
-    
-    public static String getPathLog()
-    {
-        String filePath = System.getProperty("user.dir") + System.getProperty("file.separator") + "src" + System.getProperty("file.separator") + "Config" + System.getProperty("file.separator") + "log.txt";
-        return filePath;
-    }
     
     // Charger le fichier properties
     public static Properties LoadProperties (String filePath) throws IOException

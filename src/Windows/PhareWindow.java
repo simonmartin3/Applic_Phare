@@ -7,13 +7,16 @@ package Windows;
 
 import Beans.*;
 import Classes.Persistance;
-import static Classes.Persistance.getPathLog;
+import static Classes.Persistance.*;
+import Classes.currentDate;
 import Exception.ShipWithoutIdentificationException;
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -31,17 +34,23 @@ public class PhareWindow extends javax.swing.JFrame{
      */
     
     private NetworkBasicClient nbc;
-    private int PORT = 50000;
     
     public Stack <String> vBateau = new Stack<>();
     ThreadRandomGenerator TRG;
     KindOfBoatBean kobb;
+    Properties propertiesConfig;
     
-    public PhareWindow(java.awt.Frame parent, Hashtable tmp) {
+    public PhareWindow(java.awt.Frame parent, Hashtable tmp) throws IOException {
         initComponents();
         this.setLocation(0,0);
         this.setResizable(false);
         this.setTitle("Phare d'Inpres-Harbour");
+        
+        propertiesConfig = Persistance.LoadProperties(getPathConfig());
+        
+        currentDate date = new currentDate();
+        
+        Label_currentDate.setText(date.getCurrentDate());
         
         // Thread & Beans
         kobb = new KindOfBoatBean();
@@ -49,7 +58,7 @@ public class PhareWindow extends javax.swing.JFrame{
         NotifyBean nb = new NotifyBean();
         nb.NotifyBean(this);
         
-        TRG = new ThreadRandomGenerator(kobb, 5, 100, 1, 1);
+        TRG = new ThreadRandomGenerator(kobb, 5, 100, 1, Integer.parseInt(propertiesConfig.get("timeSleep").toString())/1000);
         kobb.KindOfBoatBean(TRG);
         
         kobb.addPropertyChangeListener(bb);
@@ -59,7 +68,7 @@ public class PhareWindow extends javax.swing.JFrame{
         // Création de bateau en attente
         try
         {
-            Object obj = Persistance.LoadObject(Persistance.getPathBateau());
+            Object obj = Persistance.LoadObject(Persistance.getPath("pharePath"));
 
             //Le fichier properties des bateaux n'existe pas, on le rempli
             if(obj == null)       
@@ -76,7 +85,7 @@ public class PhareWindow extends javax.swing.JFrame{
             else
             {
                 System.err.println("Fichier rempli");
-                vBateau = (Stack < String >)Persistance.LoadObject(Persistance.getPathBateau());   
+                vBateau = (Stack < String >)Persistance.LoadObject(Persistance.getPath("pharePath"));   
             }
             
         }
@@ -121,6 +130,8 @@ public class PhareWindow extends javax.swing.JFrame{
         Label_Entrée = new javax.swing.JLabel();
         Button_Deconnecter = new javax.swing.JButton();
         Label_Image = new javax.swing.JLabel();
+        Button_Config = new javax.swing.JButton();
+        Label_currentDate = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -180,32 +191,21 @@ public class PhareWindow extends javax.swing.JFrame{
 
         Button_Deconnecter.setText("Se déconnecter du serveur");
 
+        Button_Config.setText("Config");
+        Button_Config.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Button_ConfigActionPerformed(evt);
+            }
+        });
+
+        Label_currentDate.setText("/");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(Button_Deconnecter))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(51, 51, 51)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(Button_Autorisation)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(Button_EntreeRade)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(Label_Entrée, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(jLabel3)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(Label_Réponse, javax.swing.GroupLayout.PREFERRED_SIZE, 388, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(18, 18, 18)
-                                .addComponent(Button_RAZ, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 73, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -226,7 +226,32 @@ public class PhareWindow extends javax.swing.JFrame{
                                     .addComponent(Label_Attente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(TextField_Identifié, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)))))
+                                .addGap(0, 0, Short.MAX_VALUE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(51, 51, 51)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(Label_currentDate, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(Button_Config)
+                                .addGap(18, 18, 18)
+                                .addComponent(Button_Deconnecter))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(Button_Autorisation)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(Button_EntreeRade)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(Label_Entrée, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                                .addComponent(jLabel3)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(Label_Réponse, javax.swing.GroupLayout.PREFERRED_SIZE, 388, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addGap(18, 18, 18)
+                                        .addComponent(Button_RAZ, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 73, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -259,7 +284,10 @@ public class PhareWindow extends javax.swing.JFrame{
                     .addComponent(Button_EntreeRade)
                     .addComponent(Label_Entrée))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 55, Short.MAX_VALUE)
-                .addComponent(Button_Deconnecter)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Button_Deconnecter)
+                    .addComponent(Button_Config)
+                    .addComponent(Label_currentDate))
                 .addContainerGap())
         );
 
@@ -267,7 +295,7 @@ public class PhareWindow extends javax.swing.JFrame{
     }// </editor-fold>//GEN-END:initComponents
 
     private void Button_ConnecterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Button_ConnecterActionPerformed
-        nbc = new NetworkBasicClient("localhost", PORT);
+        nbc = new NetworkBasicClient("localhost", Integer.parseInt(propertiesConfig.get("portServer").toString()));
     }//GEN-LAST:event_Button_ConnecterActionPerformed
 
     private void Button_SuivantActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Button_SuivantActionPerformed
@@ -344,6 +372,12 @@ public class PhareWindow extends javax.swing.JFrame{
         clean();
     }//GEN-LAST:event_Button_RAZActionPerformed
 
+    private void Button_ConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Button_ConfigActionPerformed
+        // TODO add your handling code here:
+        PortConfig PC = new PortConfig(this, true);
+        PC.setVisible(true);
+    }//GEN-LAST:event_Button_ConfigActionPerformed
+
     
     public void insertionBateau()
     {
@@ -368,10 +402,10 @@ public class PhareWindow extends javax.swing.JFrame{
     public void saveandload() throws IOException
     {
         // Enregistrement des bateaux dans le fichier
-        Persistance.SaveObject(vBateau, Persistance.getPathBateau());
+        Persistance.SaveObject(vBateau, Persistance.getPath("pharePath"));
         
         // Chargement des bateaux dans le Vector
-        vBateau = (Stack < String >)Persistance.LoadObject(Persistance.getPathBateau());
+        vBateau = (Stack < String >)Persistance.LoadObject(Persistance.getPath("pharePath"));
     }
 
     /**
@@ -404,13 +438,18 @@ public class PhareWindow extends javax.swing.JFrame{
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new PhareWindow(null, null).setVisible(true);
+                try {
+                    new PhareWindow(null, null).setVisible(true);
+                } catch (IOException ex) {
+                    System.err.println(ex.getMessage());
+                }
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Button_Autorisation;
+    private javax.swing.JButton Button_Config;
     private javax.swing.JButton Button_Connecter;
     private javax.swing.JButton Button_Deconnecter;
     private javax.swing.JButton Button_EntreeRade;
@@ -420,6 +459,7 @@ public class PhareWindow extends javax.swing.JFrame{
     private javax.swing.JLabel Label_Entrée;
     private javax.swing.JLabel Label_Image;
     private javax.swing.JLabel Label_Réponse;
+    private javax.swing.JLabel Label_currentDate;
     private javax.swing.JList<String> List_Attente;
     public javax.swing.JTextField TextField_Identifié;
     private javax.swing.JLabel jLabel2;

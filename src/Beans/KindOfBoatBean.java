@@ -5,8 +5,15 @@
  */
 package Beans;
 
+import Classes.Persistance;
+import static Classes.Persistance.getPathConfig;
 import Interfaces.*;
 import java.beans.*;
+import java.io.IOException;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -18,6 +25,7 @@ public class KindOfBoatBean implements UtilisateurNombre{
     private String oldType;
     private String typeBateau;
     protected PropertyChangeSupport PCS;
+    Properties properties;
     
     public void KindOfBoatBean()
     {
@@ -55,13 +63,25 @@ public class KindOfBoatBean implements UtilisateurNombre{
     }
     
     public void traiteNombre(int n)
-    {        
-        if((n % 7) == 0)
+    {       
+        try {
+            properties = Persistance.LoadProperties(getPathConfig());
+        } catch (IOException ex) {
+            System.err.println(ex.getMessage());
+        }
+        
+        StringTokenizer st = new StringTokenizer(properties.get("reference").toString(), "-");
+        
+        int plaisance = Integer.parseInt(st.nextToken());
+        int peche = Integer.parseInt(st.nextToken());
+        
+        
+        if((n % plaisance) == 0)
         {
             setTypeBateau("Plaisance");
             typeBateau="none";
         }
-        if((n % 17) == 0)
+        if((n % peche) == 0)
         {
             setTypeBateau("Peche");
             typeBateau="none";
