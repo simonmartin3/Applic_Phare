@@ -6,8 +6,13 @@
 package Windows;
 
 import Beans.*;
+import Classes.Persistance;
+import static Classes.Persistance.getPathLog;
+import Exception.ShipWithoutIdentificationException;
 import java.awt.Color;
 import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
 import java.util.*;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -52,11 +57,31 @@ public class PhareWindow extends javax.swing.JFrame{
         bb.addBoatEventListenerList(nb);        
         
         // Création de bateau en attente
+        try
+        {
+            Object obj = Persistance.LoadObject(Persistance.getPathBateau());
+
+            //Le fichier properties des bateaux n'existe pas, on le rempli
+            if(obj == null)       
+            {
+                System.err.println("Fichier vide");
+
+                vBateau.push("Plaisance / UK");
+                vBateau.push("Peche / DE");
+                vBateau.push("Plaisance / FR");
+                vBateau.push("Peche / UK");
+                
+                saveandload();
+            }
+            else
+            {
+                System.err.println("Fichier rempli");
+                vBateau = (Stack < String >)Persistance.LoadObject(Persistance.getPathBateau());   
+            }
+            
+        }
+        catch(IOException e){e.getMessage();}
         
-        vBateau.push("Plaisance / UK");
-        vBateau.push("Peche / DE");
-        vBateau.push("Plaisance / FR");
-        vBateau.push("Peche / UK");
         
         // Insertion de bateau dans la JList
         Label_Attente.setText("Bateaux en attente");
@@ -338,6 +363,15 @@ public class PhareWindow extends javax.swing.JFrame{
         Label_Entrée.setText("/");
         Label_Réponse.setText("/");
         Button_Suivant.setEnabled(true);
+    }
+    
+    public void saveandload() throws IOException
+    {
+        // Enregistrement des bateaux dans le fichier
+        Persistance.SaveObject(vBateau, Persistance.getPathBateau());
+        
+        // Chargement des bateaux dans le Vector
+        vBateau = (Stack < String >)Persistance.LoadObject(Persistance.getPathBateau());
     }
 
     /**

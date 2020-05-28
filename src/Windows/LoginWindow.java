@@ -5,9 +5,19 @@
  */
 package Windows;
 
+import Classes.Persistance;
+import static Classes.Persistance.*;
 import Exception.LoginException;
+import Exception.SailorWithoutIdentificationException;
+import Exception.ShipWithoutIdentificationException;
+import java.io.IOException;
+import java.text.DateFormat;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -22,12 +32,24 @@ public class LoginWindow extends javax.swing.JFrame {
      */
     
     Hashtable<String, String> hmap = new Hashtable<>();
+    Properties propertiesLogin;
     
-    public LoginWindow() {
-        // Création de 2 user
-        hmap.put("Simon","1234"); 
-        hmap.put("root","root");
-        
+    public LoginWindow() throws IOException {
+        // Chargement du fichier properties des logins
+        propertiesLogin = Persistance.LoadProperties(getPathLogin()); 
+             
+        //Le fichier properties des logins n'existe pas, on le crée
+        if(propertiesLogin.isEmpty())        
+        { 
+            propertiesLogin.setProperty("Simon","1234"); 
+            propertiesLogin.setProperty("root","root"); 
+           
+            //On ajoute les utilisateur
+            Persistance.SaveProperties(propertiesLogin,getPathLogin());
+            
+            // On charge le fichier qu'on vient de créer
+            propertiesLogin = Persistance.LoadProperties(getPathLogin());
+        }
         initComponents();
         this.setLocationRelativeTo(null);
         this.setResizable(false);
@@ -139,7 +161,6 @@ public class LoginWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void Button_ValiderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Button_ValiderActionPerformed
-        // TODO add your handling code here:
         String user = TextField_User.getText();
         String pass = new String(PasswordField_Password.getPassword());
         
@@ -150,39 +171,34 @@ public class LoginWindow extends javax.swing.JFrame {
             //Vérification de l'authentification
             try
             {
-                authentification(hmap, user, pass);
+                authentification(user, pass);
             } catch(LoginException tmp) {
                 tmp.Affiche();
+            } catch (ShipWithoutIdentificationException ex) {
+                ex.Affiche();
+            } catch (SailorWithoutIdentificationException ex) {
+                ex.Affiche();
+            } catch (IOException ex) {
+                ex.getMessage();
             }
         }
     }//GEN-LAST:event_Button_ValiderActionPerformed
 
-    public void authentification(Hashtable<String,String> hmap,String user,String pass) throws LoginException
-    {    
-
-        Enumeration users;
-        String key;
-        users = hmap.keys(); // Liste des user de la HashTable
+    public void authentification(String user,String pass) throws LoginException, ShipWithoutIdentificationException, SailorWithoutIdentificationException, IOException
+    {
+        String users = propertiesLogin.getProperty(user);
         
-        while(users.hasMoreElements()) // On boucle tant qu'il y a des users
+        if(users.isEmpty()) throw new LoginException("Connexion échoué (Utilisateur inconnu) !");
+        
+        if(users.equals(pass))
         {
-            key = (String) users.nextElement();
-            if(key.equals(user) == true) // user trouvé dans la liste
-            {                       
-                if(hmap.get(key).equals(pass) == true) // Vérification si user et pass correspondent
-                {
-                    System.out.println("Connexion réussie ! Lancement de l'application");
-                    PhareWindow pw;
-                    pw = new PhareWindow(this, hmap);
-                    pw.setVisible(true);
-                    this.dispose(); // Fermeture de la fenetre de connexion
-                    break;
-                }
-                else throw new LoginException("Connexion échoué (Erreur mot de passe) !");
-            }
-            else throw new LoginException("Connexion échoué (Utilisateur inconnu) !");
+            System.out.println("Connexion réussie ! Lancement de l'application");
+            PhareWindow PW;
+            PW = new PhareWindow(this, hmap);
+            PW.setVisible(true);
+            this.dispose(); // Fermeture de la fenetre de connexion
         }
-        
+        else throw new LoginException("Connexion échoué (Erreur mot de passe) !");        
     }
     
     private void Button_QuitterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Button_QuitterActionPerformed
@@ -233,7 +249,11 @@ public class LoginWindow extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new LoginWindow().setVisible(true);
+                try {
+                    new LoginWindow().setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(LoginWindow.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
